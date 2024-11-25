@@ -1,23 +1,48 @@
 pipeline {
     agent any
+
+    environment {
+        GIT_REPO = "https://github.com/Shravanya178/pipeline.git" 
+        MAIN_CLASS = 'Main'  
+    }
+
     stages {
-        stage('Build') {
+        stage('Clone Repository from Git') {
             steps {
-                echo 'Building...'
-                // Build script, like `mvn clean install` for a Maven project
+                echo 'Cloning the Git repository...'
+                // Cloning the repository from Git
+                git branch: 'main', url: "${GIT_REPO}"  
             }
         }
-        stage('Test') {
+
+        stage('Compile Java Code') {
             steps {
-                echo 'Testing...'
-                // Test commands, like `mvn test` or `npm test`
+                echo "${env.PATH}"
+                echo 'Compiling Java code...'
+               
+                // Compiling all Java files in the src folder
+                bat 'javac Main.java'  
             }
         }
-        stage('Deploy') {
+
+        stage('Run Java Application') {
             steps {
-                echo 'Deploying...'
-                // Deployment script, like pushing to a server
+                echo 'Running the Java application...'
+                // Running the compiled Java application
+                bat 'java Main'  
             }
-        }                                                                                                               
+        }
+    }
+
+
+    post {
+        success {
+            echo 'Java Build and Execution were successful!'
+        }
+        failure {
+            echo 'Java Build or Execution failed!'
+        }
     }
 }
+
+
